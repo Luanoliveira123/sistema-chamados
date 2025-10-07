@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Desenvolvido%20com-Flask-blue?style=for-the-badge&logo=flask&logoColor=white">
+  <img src="https://img.shields.io/badge/Projeto-UniRios%202025-green?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Linguagem-Python-yellow?style=for-the-badge&logo=python">
+</p>
+
+---
+
 # 🏫 Sistema de Chamados Institucionais
 
 Um sistema web desenvolvido em **Flask (Python)** para **gerenciamento de chamados técnicos institucionais**, facilitando a comunicação entre setores de manutenção, limpeza, almoxarifado e TI.
@@ -75,6 +83,17 @@ Curso: *Sistemas de Informação*
 
 O sistema será hospedado na plataforma **Render**,  
 permitindo acesso público via link institucional e QR Code.
+
+---
+
+## 📱 QR Code de Acesso
+
+Use o QR Code abaixo para acessar o sistema de chamados diretamente do celular  
+(após o deploy no Render, substitua o link pelo domínio público):
+
+<p align="center">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://127.0.0.1:5000" alt="QR Code do Sistema">
+</p>
 
 ---
 
