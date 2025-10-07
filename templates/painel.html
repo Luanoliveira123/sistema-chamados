@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="mt-3 mb-4 fw-bold text-primary">Painel — {{ setor }}</h4>
+
+<div class="mb-3">
+  <a class="btn btn-outline-primary btn-sm {% if filtro=='aberto' %}active{% endif %}" href="{{ url_for('painel', status='aberto') }}">Abertos</a>
+  <a class="btn btn-outline-warning btn-sm {% if filtro=='em_andamento' %}active{% endif %}" href="{{ url_for('painel', status='em_andamento') }}">Em andamento</a>
+  <a class="btn btn-outline-success btn-sm {% if filtro=='finalizado' %}active{% endif %}" href="{{ url_for('painel', status='finalizado') }}">Finalizados</a>
+  <a class="btn btn-outline-secondary btn-sm {% if filtro=='todos' %}active{% endif %}" href="{{ url_for('painel', status='todos') }}">Todos</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover align-middle text-center shadow-sm">
+    <thead class="table-primary">
+      <tr>
+        <th>#</th>
+        <th>Local</th>
+        <th>Descrição</th>
+        <th>Prioridade</th>
+        <th>Status</th>
+        <th>Abertura</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in chamados %}
+      <tr>
+        <td><strong>{{ c.id }}</strong></td>
+        <td>{{ c.local }}</td>
+        <td class="text-start">{{ c.descricao }}</td>
+        <td>
+          {% if c.prioridade == 'vermelho' %}
+          <span class="badge bg-danger">Urgente</span>
+          {% else %}
+          <span class="badge bg-success">Normal</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.status == 'aberto' %}
+          <span class="badge bg-secondary">Aberto</span>
+          {% elif c.status == 'em_andamento' %}
+          <span class="badge bg-warning text-dark">Em andamento</span>
+          {% else %}
+          <span class="badge bg-success">Finalizado</span>
+          {% endif %}
+        </td>
+        <td>{{ c.criado_em }}</td>
+        <td>
+          <form method="post" action="{{ url_for('alterar', cid=c.id) }}">
+            <select name="status" class="form-select form-select-sm d-inline w-auto">
+              <option value="aberto" {% if c.status=='aberto' %}selected{% endif %}>Aberto</option>
+              <option value="em_andamento" {% if c.status=='em_andamento' %}selected{% endif %}>Em andamento</option>
+              <option value="finalizado" {% if c.status=='finalizado' %}selected{% endif %}>Finalizado</option>
+            </select>
+            <button class="btn btn-sm btn-primary ms-1">Salvar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

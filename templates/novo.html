@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center mt-3 mb-5">
+  <div class="card shadow-lg p-4 w-100" style="max-width: 420px; border-radius: 1rem;">
+    
+    <div class="text-center mb-3">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" width="80" height="80" class="mb-2 rounded-circle shadow-sm">
+      <h4 class="fw-bold text-primary">Abrir Chamado</h4>
+      <p class="text-muted small mb-0">Preencha as informações abaixo para registrar seu chamado</p>
+    </div>
+
+    <form method="post" action="{{ url_for('abrir') }}">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Local</label>
+        <input type="text" name="local" class="form-control form-control-lg" placeholder="Ex: Bloco B, Sala 203" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Setor responsável</label>
+        <select name="setor_responsavel" class="form-select form-select-lg" required>
+          <option value="" disabled selected>Selecione o setor...</option>
+          {% for s in setores_responsaveis %}
+          <option value="{{ s }}">{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Descrição</label>
+        <textarea name="descricao" class="form-control form-control-lg" rows="3" placeholder="Descreva o problema" required></textarea>
+      </div>
+
+      <div class="mb-4 text-center">
+        <label class="form-label fw-semibold">Urgência</label>
+        <div class="d-flex justify-content-center gap-3 mt-2">
+          <label class="btn btn-outline-success">
+            <input type="radio" name="prioridade" value="verde" autocomplete="off" checked> Verde — sem urgência
+          </label>
+          <label class="btn btn-outline-danger">
+            <input type="radio" name="prioridade" value="vermelho" autocomplete="off"> Vermelho — urgente
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 fs-5 shadow-sm">
+        <i class="bi bi-send"></i> Enviar Chamado
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

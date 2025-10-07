@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" width="100" height="100" class="rounded-circle shadow-sm mb-3">
+    <h2 class="fw-bold text-primary">Sistema de Chamados Institucionais</h2>
+    <p class="text-muted mb-4 fs-5">
+      Registre solicitações de manutenção, suporte técnico ou limpeza de forma simples e rápida.
+    </p>
+
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <a href="{{ url_for('novo_chamado') }}" class="btn btn-primary btn-lg px-4 shadow-sm">
+        <i class="bi bi-pencil-square me-2"></i> Abrir Chamado
+      </a>
+      <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4 shadow-sm">
+        <i class="bi bi-person-gear me-2"></i> Área Técnica
+      </a>
+    </div>
+
+    <hr class="my-5" style="width: 60%; margin: auto;">
+    <p class="text-secondary small mb-0">
+      Desenvolvido para uso institucional — <strong>UniRios 2025</strong><br>
+      <em>Computação em Nuvem como catalisadora da transformação digital</em>.
+    </p>
+  </div>
+</div>
+
+{% endblock %}
