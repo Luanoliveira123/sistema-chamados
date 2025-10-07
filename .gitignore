@@ -1,0 +1,36 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+ENV/
+
+# Cache e arquivos temporários
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pdb
+*.db-journal
+
+# Configurações locais
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# Arquivos do Flask e banco de dados local
+instance/
+*.sqlite3
+*.db
+
+# Arquivos de ambiente
+.env
+*.bak
+*.swp
+
+# Pasta de dependências de build
+build/
+dist/
+*.egg-info/
