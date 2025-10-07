@@ -34,3 +34,11 @@ instance/
 build/
 dist/
 *.egg-info/
+
+# ambiente virtual
+venv/
+__pycache__/
+*.pyc
+
+# banco de dados local
+instance/

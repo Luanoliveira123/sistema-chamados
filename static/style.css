@@ -1,22 +1,39 @@
+/* ==========================================
+   ESTILO GLOBAL - SISTEMA DE CHAMADOS UNIRIOS
+   ========================================== */
+
+:root {
+  --azul-escuro: #003580;
+  --azul-claro: #0078ff;
+  --cinza-claro: #f8f9fa;
+  --texto: #333;
+  --sombra: rgba(0, 0, 0, 0.08);
+}
+
 body {
-  background-color: #f8f9fa;
-  font-family: "Segoe UI", sans-serif;
-  color: #333;
+  background-color: var(--cinza-claro);
+  font-family: "Segoe UI", "Inter", sans-serif;
+  color: var(--texto);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* ===== NAVBAR ESTILO ===== */
+/* ===================== NAVBAR ===================== */
 .navbar {
-  background: linear-gradient(90deg, #003580, #0078ff);
+  background: linear-gradient(90deg, var(--azul-escuro), var(--azul-claro));
+  box-shadow: 0 2px 6px var(--sombra);
 }
 
-.navbar-brand {
-  color: #fff !important;
+.navbar-brand span {
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 
 .nav-link {
-  color: #f1f1f1 !important;
+  color: #f0f0f0 !important;
   font-weight: 500;
-  transition: color 0.2s ease, transform 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
@@ -25,37 +42,233 @@ body {
 }
 
 .btn.btn-light {
-  background-color: #ffffff;
+  background-color: #fff;
   border: none;
-  transition: all 0.2s ease-in-out;
+  color: var(--azul-claro);
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn.btn-light:hover {
   background-color: #e9ecef;
-  color: #0d6efd !important;
 }
 
-
-.btn-primary {
-  background: linear-gradient(90deg, #004aad, #0078ff);
-  border: none;
-}
-
+/* ===================== CARDS ===================== */
 .card {
   border: none;
   border-radius: 1rem;
+  box-shadow: 0 4px 8px var(--sombra);
   background-color: #fff;
+  transition: all 0.25s ease;
+  animation: fadeInUp 0.4s ease;
 }
 
-h2, h4 {
-  color: #003580;
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px var(--sombra);
 }
 
+/* ===================== BOTÕES ===================== */
+.btn-primary {
+  background: linear-gradient(90deg, var(--azul-escuro), var(--azul-claro));
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.btn-outline-primary {
+  color: var(--azul-claro);
+  border: 1.8px solid var(--azul-claro);
+  font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--azul-claro);
+  color: white;
+}
+
+/* ===================== TABELAS ===================== */
+.table {
+  border-radius: 0.3rem;
+  overflow: hidden;
+  box-shadow: 0 3px 6px var(--sombra);
+}
+
+.table thead {
+  background: linear-gradient(90deg, var(--azul-escuro), var(--azul-claro));
+  color: white;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 119, 255, 0.05);
+  transition: 0.2s ease;
+}
+
+/* ===================== STATUS BADGES ===================== */
+.badge {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #333 !important;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+/* ===================== MOBILE ===================== */
 @media (max-width: 576px) {
-  h2 {
+  h2, h4 {
     font-size: 1.3rem;
   }
+
   .btn {
     width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  nav.navbar span {
+    font-size: 0.95rem;
   }
 }
+
+/* ====== ANIMAÇÃO SUAVE PADRÃO ====== */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === FORMULÁRIO DE NOVO CHAMADO === */
+.form-card {
+  max-width: 600px;
+  margin: 30px auto;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 25px 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-card label {
+  font-weight: 600;
+  color: #004aad;
+}
+
+.form-card textarea,
+.form-card select,
+.form-card input {
+  border-radius: 0.5rem;
+  border: 1.4px solid #ccc;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-card textarea:focus,
+.form-card select:focus,
+.form-card input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+}
+
+.prioridade-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 10px 0 25px;
+}
+
+.prioridade-container label {
+  font-weight: 600;
+}
+
+/* ======== LOGIN ======== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(85vh - 140px);
+  background: var(--cinza-claro);
+  padding: 40px 10px 60px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  animation: fadeInLogin 0.6s ease-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.login-logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  object-fit: contain;
+  margin: -50px auto 20px;
+  display: block;
+  background: #fff;
+  padding: 8px;
+}
+
+/* ======== ANIMAÇÃO DE ENTRADA DO LOGIN ======== */
+@keyframes fadeInLogin {
+  0% {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======== RODAPÉ FIXO ======== */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  border-top: 1px solid #dee2e6;
+  z-index: 1000;
+}
+

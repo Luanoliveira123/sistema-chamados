@@ -1,18 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h4 class="mt-3 mb-4 fw-bold text-primary">Painel — {{ setor }}</h4>
-
-<div class="mb-3">
-  <a class="btn btn-outline-primary btn-sm {% if filtro=='aberto' %}active{% endif %}" href="{{ url_for('painel', status='aberto') }}">Abertos</a>
-  <a class="btn btn-outline-warning btn-sm {% if filtro=='em_andamento' %}active{% endif %}" href="{{ url_for('painel', status='em_andamento') }}">Em andamento</a>
-  <a class="btn btn-outline-success btn-sm {% if filtro=='finalizado' %}active{% endif %}" href="{{ url_for('painel', status='finalizado') }}">Finalizados</a>
-  <a class="btn btn-outline-secondary btn-sm {% if filtro=='todos' %}active{% endif %}" href="{{ url_for('painel', status='todos') }}">Todos</a>
+<!-- Cabeçalho do Painel -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mt-3 mb-3">
+  <h4 class="fw-bold text-primary mb-2">Painel Técnico — {{ setor }}</h4>
+  
+  <div>
+    <a class="btn btn-outline-primary btn-sm {% if filtro=='aberto' %}active{% endif %}" href="{{ url_for('painel', status='aberto') }}">
+      <i class="bi bi-folder2-open"></i> Abertos
+    </a>
+    <a class="btn btn-outline-warning btn-sm {% if filtro=='em_andamento' %}active{% endif %}" href="{{ url_for('painel', status='em_andamento') }}">
+      <i class="bi bi-hourglass-split"></i> Em andamento
+    </a>
+    <a class="btn btn-outline-success btn-sm {% if filtro=='finalizado' %}active{% endif %}" href="{{ url_for('painel', status='finalizado') }}">
+      <i class="bi bi-check-circle"></i> Finalizados
+    </a>
+    <a class="btn btn-outline-secondary btn-sm {% if filtro=='todos' %}active{% endif %}" href="{{ url_for('painel', status='todos') }}">
+      <i class="bi bi-collection"></i> Todos
+    </a>
+  </div>
 </div>
 
+<!-- Tabela de Chamados -->
 <div class="table-responsive">
-  <table class="table table-hover align-middle text-center shadow-sm">
-    <thead class="table-primary">
+  <table class="table table-hover align-middle text-center">
+    <thead>
       <tr>
         <th>#</th>
         <th>Local</th>
@@ -24,9 +36,16 @@
       </tr>
     </thead>
     <tbody>
+      {% if chamados|length == 0 %}
+      <tr>
+        <td colspan="7" class="text-muted py-4">
+          <i class="bi bi-inbox me-2"></i> Nenhum chamado encontrado para este filtro.
+        </td>
+      </tr>
+      {% else %}
       {% for c in chamados %}
       <tr>
-        <td><strong>{{ c.id }}</strong></td>
+        <td><strong>#{{ c.id }}</strong></td>
         <td>{{ c.local }}</td>
         <td class="text-start">{{ c.descricao }}</td>
         <td>
@@ -47,19 +66,27 @@
         </td>
         <td>{{ c.criado_em }}</td>
         <td>
-          <form method="post" action="{{ url_for('alterar', cid=c.id) }}">
-            <select name="status" class="form-select form-select-sm d-inline w-auto">
+          <form method="post" action="{{ url_for('alterar', cid=c.id) }}" class="d-flex justify-content-center align-items-center gap-2">
+            <select name="status" class="form-select form-select-sm" style="max-width: 140px;">
               <option value="aberto" {% if c.status=='aberto' %}selected{% endif %}>Aberto</option>
               <option value="em_andamento" {% if c.status=='em_andamento' %}selected{% endif %}>Em andamento</option>
               <option value="finalizado" {% if c.status=='finalizado' %}selected{% endif %}>Finalizado</option>
             </select>
-            <button class="btn btn-sm btn-primary ms-1">Salvar</button>
+            <button class="btn btn-sm btn-primary" type="submit">Salvar</button>
+            </button>
           </form>
         </td>
       </tr>
       {% endfor %}
+      {% endif %}
     </tbody>
   </table>
 </div>
+
+<!-- Rodapé do Painel -->
+<footer class="mt-4 text-center text-muted small">
+  <i class="bi bi-lightning-charge text-warning"></i> Sistema de Chamados Institucionais - UniRios 2025
+</footer>
+
 
 {% endblock %}
