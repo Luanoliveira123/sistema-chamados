@@ -117,7 +117,7 @@ body {
 }
 
 .badge.bg-secondary {
-  background-color: #6c757d !important;
+  background-color: #1287ec !important;
 }
 
 .badge.bg-warning {
@@ -272,3 +272,11 @@ footer {
   z-index: 1000;
 }
 
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+  transition: 0.2s;
+}
+.btn-danger:hover {
+  background-color: #bb2d3b;
+}

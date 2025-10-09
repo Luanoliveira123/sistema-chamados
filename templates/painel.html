@@ -1,81 +1,126 @@
 {% extends "base.html" %}
-{% block content %}
+{% block conteudo %}
 
 <!-- Cabeçalho do Painel -->
 <div class="d-flex justify-content-between align-items-center flex-wrap mt-3 mb-3">
   <h4 class="fw-bold text-primary mb-2">Painel Técnico — {{ setor }}</h4>
-  
-  <div>
-    <a class="btn btn-outline-primary btn-sm {% if filtro=='aberto' %}active{% endif %}" href="{{ url_for('painel', status='aberto') }}">
+
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <!-- Filtros de status -->
+    <a class="btn btn-outline-primary btn-sm {% if filtro=='aberto' %}active{% endif %}"
+      href="{{ url_for('painel', status='aberto', setor_filtro=request.args.get('setor_filtro')) }}">
       <i class="bi bi-folder2-open"></i> Abertos
     </a>
-    <a class="btn btn-outline-warning btn-sm {% if filtro=='em_andamento' %}active{% endif %}" href="{{ url_for('painel', status='em_andamento') }}">
+    <a class="btn btn-outline-warning btn-sm {% if filtro=='em andamento' %}active{% endif %}"
+      href="{{ url_for('painel', status='em andamento', setor_filtro=request.args.get('setor_filtro')) }}">
       <i class="bi bi-hourglass-split"></i> Em andamento
     </a>
-    <a class="btn btn-outline-success btn-sm {% if filtro=='finalizado' %}active{% endif %}" href="{{ url_for('painel', status='finalizado') }}">
+    <a class="btn btn-outline-success btn-sm {% if filtro=='finalizado' %}active{% endif %}"
+      href="{{ url_for('painel', status='finalizado', setor_filtro=request.args.get('setor_filtro')) }}">
       <i class="bi bi-check-circle"></i> Finalizados
     </a>
-    <a class="btn btn-outline-secondary btn-sm {% if filtro=='todos' %}active{% endif %}" href="{{ url_for('painel', status='todos') }}">
+    <a class="btn btn-outline-secondary btn-sm {% if filtro=='todos' %}active{% endif %}"
+      href="{{ url_for('painel', status='todos', setor_filtro=request.args.get('setor_filtro')) }}">
       <i class="bi bi-collection"></i> Todos
     </a>
+
+    <!-- NOVO SELETOR DE SETOR -->
+    {% if session.get('usuario') == 'nti' %}
+    <form method="get" action="{{ url_for('painel') }}" class="ms-3 d-flex align-items-center">
+      <input type="hidden" name="status" value="{{ filtro }}">
+      <select name="setor_filtro" class="form-select form-select-sm" style="min-width:160px;"
+        onchange="this.form.submit()">
+        <option value="">Todos os Setores</option>
+        {% for nome_setor in ['NTI', 'Elétrica/Clima', 'Almoxarifado', 'Limpeza', 'Manutenção Predial'] %}
+        <option value="{{ nome_setor }}" {% if request.args.get('setor_filtro')==nome_setor %}selected{% endif %}>
+          {{ nome_setor }}
+        </option>
+        {% endfor %}
+      </select>
+    </form>
+    {% endif %}
   </div>
 </div>
 
 <!-- Tabela de Chamados -->
-<div class="table-responsive">
+<div class="table-responsive mb-5" style="padding-bottom: 20px;">
   <table class="table table-hover align-middle text-center">
-    <thead>
-      <tr>
+    <thead class="align-middle" style="vertical-align:middle;">
+      <tr style="background:#f3f4f6;">
         <th>#</th>
+        <th>Setor Responsável</th>
         <th>Local</th>
         <th>Descrição</th>
         <th>Prioridade</th>
         <th>Status</th>
         <th>Abertura</th>
-        <th>Ações</th>
+        <th style="text-align:center;">Ações</th>
       </tr>
     </thead>
     <tbody>
       {% if chamados|length == 0 %}
       <tr>
-        <td colspan="7" class="text-muted py-4">
+        <td colspan="8" class="text-muted py-4">
           <i class="bi bi-inbox me-2"></i> Nenhum chamado encontrado para este filtro.
         </td>
       </tr>
       {% else %}
       {% for c in chamados %}
-      <tr>
+      <tr style="vertical-align:middle;">
         <td><strong>#{{ c.id }}</strong></td>
+        <td>{{ c.setor_responsavel }}</td>
         <td>{{ c.local }}</td>
-        <td class="text-start">{{ c.descricao }}</td>
+        <td class="text-start" style="max-width:420px; white-space:normal;">{{ c.descricao }}</td>
+
+        <!-- Prioridade -->
         <td>
           {% if c.prioridade == 'vermelho' %}
           <span class="badge bg-danger">Urgente</span>
+          {% elif c.prioridade == 'amarelo' %}
+          <span class="badge bg-warning text-dark">Média</span>
           {% else %}
           <span class="badge bg-success">Normal</span>
           {% endif %}
         </td>
+
+        <!-- Status -->
         <td>
           {% if c.status == 'aberto' %}
           <span class="badge bg-secondary">Aberto</span>
-          {% elif c.status == 'em_andamento' %}
+          {% elif c.status == 'em andamento' %}
           <span class="badge bg-warning text-dark">Em andamento</span>
           {% else %}
           <span class="badge bg-success">Finalizado</span>
           {% endif %}
         </td>
+
         <td>{{ c.criado_em }}</td>
-        <td>
-          <form method="post" action="{{ url_for('alterar', cid=c.id) }}" class="d-flex justify-content-center align-items-center gap-2">
-            <select name="status" class="form-select form-select-sm" style="max-width: 140px;">
-              <option value="aberto" {% if c.status=='aberto' %}selected{% endif %}>Aberto</option>
-              <option value="em_andamento" {% if c.status=='em_andamento' %}selected{% endif %}>Em andamento</option>
-              <option value="finalizado" {% if c.status=='finalizado' %}selected{% endif %}>Finalizado</option>
-            </select>
-            <button class="btn btn-sm btn-primary" type="submit">Salvar</button>
-            </button>
-          </form>
+
+        <!-- Ações -->
+        <td style="text-align:center; width:220px;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:18px;">
+            <!-- Formulário de alteração -->
+            <form method="post" action="{{ url_for('alterar', cid=c.id) }}"
+              style="display:flex; flex-direction:row; align-items:center; gap:12px;">
+
+              <select name="status" required class="form-select form-select-sm text-center" style="min-width:120px;">
+                <option value="aberto" {% if c.status=='aberto' %}selected{% endif %}>Aberto</option>
+                <option value="em andamento" {% if c.status=='em andamento' %}selected{% endif %}>Em andamento</option>
+                <option value="finalizado" {% if c.status=='finalizado' %}selected{% endif %}>Finalizado</option>
+              </select>
+
+              <button class="btn btn-primary btn-sm w-100" type="submit">Salvar</button>
+            </form>
+
+            <!-- Formulário separado para exclusão -->
+            <form method="post" action="{{ url_for('excluir', cid=c.id) }}"
+              onsubmit="return confirm('Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.');"
+              style="display:flex; align-items:center; justify-content:center;">
+              <button type="submit" class="btn btn-danger btn-sm w-100">Excluir</button>
+            </form>
+          </div>
         </td>
+
       </tr>
       {% endfor %}
       {% endif %}
@@ -83,10 +128,56 @@
   </table>
 </div>
 
-<!-- Rodapé do Painel -->
+<!-- Rodapé -->
 <footer class="mt-4 text-center text-muted small">
   <i class="bi bi-lightning-charge text-warning"></i> Sistema de Chamados Institucionais - UniRios 2025
 </footer>
 
+<style>
+  .table th,
+  .table td {
+    vertical-align: middle !important;
+    text-align: center;
+  }
+
+  .badge.bg-danger {
+    background: #dc2626 !important;
+  }
+
+  .badge.bg-success {
+    background: #16a34a !important;
+  }
+
+  .badge.bg-warning {
+    background: #f59e0b !important;
+    color: #fff !important;
+  }
+
+  .btn.btn-primary {
+    background: #2563eb;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
+
+  .btn.btn-primary:hover {
+    filter: brightness(.95);
+  }
+
+  .btn.btn-danger {
+    background: #dc2626;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
+
+  .btn.btn-danger:hover {
+    filter: brightness(.9);
+  }
+
+  select.form-select-sm {
+    font-size: 14px;
+  }
+</style>
 
 {% endblock %}

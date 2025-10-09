@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="container" style="margin-top: 28px; margin-bottom: 80px;"> <!-- 👈 Adicionado margin-bottom para respiro -->
+
+  <div class="flex-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div>
+      <h2 style="margin:0 0 6px 0;">📊 Painel Geral — NTI</h2>
+      <p class="text-muted" style="margin:0;">Visão consolidada dos chamados de todos os setores.</p>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="{{ url_for('painel') }}" class="btn btn-primary">Ir para Painel</a>
+      <a href="{{ url_for('backup_excel') }}" class="btn btn-secondary">📦 Fazer Backup</a>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-top:18px;">
+    <div class="kpi-card" id="kpi-abertos" style="background:#3b82f6; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
+      <div style="font-size:13px; opacity:.9;">Abertos</div>
+      <div id="kpiAbertosVal" style="font-size:32px; font-weight:700;">0</div>
+    </div>
+    <div class="kpi-card" id="kpi-andamento" style="background:#f59e0b; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
+      <div style="font-size:13px; opacity:.9;">Em andamento</div>
+      <div id="kpiAndamentoVal" style="font-size:32px; font-weight:700;">0</div>
+    </div>
+    <div class="kpi-card" id="kpi-finalizados" style="background:#10b981; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
+      <div style="font-size:13px; opacity:.9;">Finalizados</div>
+      <div id="kpiFinalizadosVal" style="font-size:32px; font-weight:700;">0</div>
+    </div>
+    <div class="kpi-card" id="kpi-total" style="background:#111827; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
+      <div style="font-size:13px; opacity:.9;">Total</div>
+      <div id="kpiTotalVal" style="font-size:32px; font-weight:700;">0</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:18px; margin-top:18px;">
+    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05);">
+      <h4 style="margin:0 0 10px 0;">Distribuição por Status</h4>
+      <canvas id="chartStatus"></canvas>
+    </div>
+    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05);">
+      <h4 style="margin:0 0 10px 0;">Chamados por Setor</h4>
+      <canvas id="chartSetor"></canvas>
+    </div>
+    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05); grid-column:1 / -1;">
+      <h4 style="margin:0 0 10px 0;">Evolução (últimos 30 dias)</h4>
+      <canvas id="chartDia"></canvas>
+    </div>
+  </div>
+
+  <!-- Tabela geral -->
+  <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05); margin-top:18px; padding-bottom:20px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <h4 style="margin:0;">Últimos chamados</h4>
+      <input id="busca" type="text" placeholder="Filtrar..." style="border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px; outline:none;">
+    </div>
+    <div style="overflow:auto; margin-top:10px;">
+      <table class="tabela" style="width:100%; border-collapse:collapse; text-align:center;">
+        <thead>
+          <tr style="background:#f3f4f6; vertical-align:middle;">
+            <th style="padding:10px;">#</th>
+            <th style="padding:10px;">Setor</th>
+            <th style="padding:10px;">Local</th>
+            <th style="padding:10px;">Descrição</th>
+            <th style="padding:10px;">Prioridade</th>
+            <th style="padding:10px;">Status</th>
+            <th style="padding:10px;">Abertura</th>
+            <th style="padding:10px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          {% for c in ultimos %}
+          <tr style="vertical-align:middle;">
+            <td style="padding:10px;">#{{ c['id'] }}</td>
+            <td style="padding:10px;">{{ c['setor_responsavel'] }}</td>
+            <td style="padding:10px;">{{ c['local'] }}</td>
+            <td style="padding:10px; max-width:420px; white-space:normal; text-align:left;">
+              {% set desc = c['descricao'] %}
+              {% if desc|length > 100 %}
+                <span class="descricao-curta">{{ desc[:100] }}...</span>
+                <span class="descricao-completa d-none">{{ desc }}</span>
+                <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
+              {% else %}
+                {{ desc }}
+              {% endif %}
+            </td>
+            <td style="padding:10px;">
+              {% if c['prioridade'] == 'vermelho' %}
+                <span class="badge bg-danger">Urgente</span>
+              {% elif c['prioridade'] == 'amarelo' %}
+                <span class="badge bg-warning text-dark">Média</span>
+              {% else %}
+                <span class="badge bg-success">Normal</span>
+              {% endif %}
+            </td>
+            <td style="padding:10px;">
+              <span class="badge" data-status="{{ c['status'] }}">{{ c['status'].capitalize() }}</span>
+            </td>
+            <td style="padding:10px;">{{ c['criado_em'] }}</td>
+
+            <!-- ✅ Ações corrigidas -->
+            <td style="padding:10px; text-align:center; width:200px;">
+              <div style="display:flex; align-items:center; justify-content:center; gap:16px;">
+                
+                <!-- Formulário para alterar status -->
+                <form method="post" action="{{ url_for('alterar', cid=c['id']) }}" 
+                      style="display:flex; flex-direction:row; align-items:center; gap:12px;">
+                  <select name="status" required class="form-select form-select-sm text-center" style="min-width:120px;">
+                    <option value="aberto" {{ 'selected' if c['status']=='aberto' else '' }}>Aberto</option>
+                    <option value="em andamento" {{ 'selected' if c['status']=='em andamento' else '' }}>Em andamento</option>
+                    <option value="finalizado" {{ 'selected' if c['status']=='finalizado' else '' }}>Finalizado</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm w-100" type="submit">Salvar</button>
+                </form>
+
+                <!-- Formulário separado para excluir -->
+                <form method="post" action="{{ url_for('excluir', cid=c['id']) }}" 
+                      onsubmit="return confirm('Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.');"
+                      style="display:flex; align-items:center; justify-content:center;">
+                  <button type="submit" class="btn btn-danger btn-sm w-100">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Ver mais -->
+<script>
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-vermais")) {
+    const btn = e.target;
+    const curta = btn.previousElementSibling.previousElementSibling;
+    const completa = btn.previousElementSibling;
+    const expanded = !completa.classList.contains("d-none");
+
+    if (expanded) {
+      completa.classList.add("d-none");
+      curta.classList.remove("d-none");
+      btn.textContent = "Ver mais";
+    } else {
+      completa.classList.remove("d-none");
+      curta.classList.add("d-none");
+      btn.textContent = "Ver menos";
+    }
+  }
+});
+</script>
+
+<!-- Charts -->
+<script>
+async function loadOverview() {
+  const r = await fetch('/api/dashboard/overview'); if (!r.ok) return;
+  const d = await r.json();
+  document.getElementById('kpiAbertosVal').textContent = d.abertos ?? 0;
+  document.getElementById('kpiAndamentoVal').textContent = d.andamento ?? 0;
+  document.getElementById('kpiFinalizadosVal').textContent = d.finalizados ?? 0;
+  document.getElementById('kpiTotalVal').textContent = d.total ?? 0;
+
+  const ctx1 = document.getElementById('chartStatus');
+  new Chart(ctx1, {
+    type: 'doughnut',
+    data: { labels: ['Abertos', 'Em andamento', 'Finalizados'], datasets: [{ data: [d.abertos, d.andamento, d.finalizados] }] },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+async function loadBySector() {
+  const r = await fetch('/api/dashboard/by_sector'); if (!r.ok) return;
+  const d = await r.json();
+  const ctx2 = document.getElementById('chartSetor');
+  new Chart(ctx2, {
+    type: 'bar',
+    data: { labels: d.labels, datasets: [{ label: 'Chamados', data: d.values }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+}
+async function loadByDay() {
+  const r = await fetch('/api/dashboard/by_day'); if (!r.ok) return;
+  const d = await r.json();
+  const ctx3 = document.getElementById('chartDia');
+  new Chart(ctx3, {
+    type: 'line',
+    data: { labels: d.labels, datasets: [{ label: 'Chamados/dia', data: d.values, tension: .3 }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+}
+const busca = document.getElementById('busca');
+if (busca) {
+  busca.addEventListener('input', () => {
+    const termo = busca.value.toLowerCase();
+    document.querySelectorAll('#tbody tr').forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(termo) ? '' : 'none';
+    });
+  });
+}
+loadOverview(); loadBySector(); loadByDay();
+</script>
+
+<style>
+.badge[data-status="aberto"]{ background:#e5e7eb; color:#111827; border-radius:999px; padding:4px 10px; font-size:12px; }
+.badge[data-status="em andamento"]{ background:#f59e0b; color:#fff; border-radius:999px; padding:4px 10px; font-size:12px; }
+.badge[data-status="finalizado"]{ background:#10b981; color:#fff; border-radius:999px; padding:4px 10px; font-size:12px; }
+.form-select{ border:1px solid #e5e7eb; border-radius:10px; padding:6px 8px; outline:none; }
+.btn.btn-primary{ background:#2563eb; border:none; border-radius:10px; padding:6px 12px; color:#fff; cursor:pointer; }
+.btn.btn-primary:hover{ filter:brightness(.95); }
+.btn-vermais{ color:#2563eb; font-weight:500; text-decoration:none; }
+.btn-vermais:hover{ text-decoration:underline; color:#1d4ed8; }
+</style>
+
+<footer class="mt-5 text-center text-muted small">
+  ⚡ Sistema de Chamados Institucionais - UniRios 2025
+</footer>
+
+{% endblock %}
