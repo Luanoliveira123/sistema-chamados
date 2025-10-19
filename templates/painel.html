@@ -36,7 +36,8 @@
       <select name="setor_filtro" class="form-select form-select-sm" style="min-width:160px;"
         onchange="this.form.submit()">
         <option value="">Todos os Setores</option>
-        {% for nome_setor in ['NTI', 'Elétrica/Clima', 'Almoxarifado', 'Limpeza', 'Manutenção Predial'] %}
+        {% for nome_setor in ['NTI', 'Elétrica-Coinfra', 'Manutenção', 'Almoxarifado', 'Administração', 'Servidor',
+        'Limpeza'] %}
         <option value="{{ nome_setor }}" {% if request.args.get('setor_filtro')==nome_setor %}selected{% endif %}>
           {{ nome_setor }}
         </option>
@@ -44,6 +45,8 @@
       </select>
     </form>
     {% endif %}
+
+
   </div>
 </div>
 
