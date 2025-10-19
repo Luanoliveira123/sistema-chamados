@@ -23,6 +23,11 @@
       href="{{ url_for('painel', status='todos', setor_filtro=request.args.get('setor_filtro')) }}">
       <i class="bi bi-collection"></i> Todos
     </a>
+    <!-- Botão de Backup -->
+    <a href="{{ url_for('backup_excel') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-download"></i> Backup
+    </a>
+
 
     <!-- Seletor de setor (somente NTI) -->
     {% if session.get('usuario') == 'nti' %}
@@ -77,11 +82,11 @@
         <td class="text-start" style="max-width:420px; white-space:normal;">
           {% set desc = c.descricao %}
           {% if desc|length > 100 %}
-            <span class="descricao-curta">{{ desc[:100] }}...</span>
-            <span class="descricao-completa d-none">{{ desc }}</span>
-            <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
+          <span class="descricao-curta">{{ desc[:100] }}...</span>
+          <span class="descricao-completa d-none">{{ desc }}</span>
+          <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
           {% else %}
-            {{ desc }}
+          {{ desc }}
           {% endif %}
         </td>
 
@@ -139,71 +144,71 @@
 
 <!-- Script Ver Mais -->
 <script>
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("btn-vermais")) {
-    const btn = e.target;
-    const curta = btn.previousElementSibling.previousElementSibling;
-    const completa = btn.previousElementSibling;
-    const expanded = !completa.classList.contains("d-none");
-    if (expanded) {
-      completa.classList.add("d-none");
-      curta.classList.remove("d-none");
-      btn.textContent = "Ver mais";
-    } else {
-      completa.classList.remove("d-none");
-      curta.classList.add("d-none");
-      btn.textContent = "Ver menos";
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-vermais")) {
+      const btn = e.target;
+      const curta = btn.previousElementSibling.previousElementSibling;
+      const completa = btn.previousElementSibling;
+      const expanded = !completa.classList.contains("d-none");
+      if (expanded) {
+        completa.classList.add("d-none");
+        curta.classList.remove("d-none");
+        btn.textContent = "Ver mais";
+      } else {
+        completa.classList.remove("d-none");
+        curta.classList.add("d-none");
+        btn.textContent = "Ver menos";
+      }
     }
-  }
-});
+  });
 </script>
 
 <!-- Estilos -->
 <style>
-.table th,
-.table td {
-  vertical-align: middle !important;
-  text-align: center;
-}
+  .table th,
+  .table td {
+    vertical-align: middle !important;
+    text-align: center;
+  }
 
-.badge.bg-danger {
-  background: #dc2626 !important;
-}
+  .badge.bg-danger {
+    background: #dc2626 !important;
+  }
 
-.badge.bg-success {
-  background: #16a34a !important;
-}
+  .badge.bg-success {
+    background: #16a34a !important;
+  }
 
-.badge.bg-warning {
-  background: #f59e0b !important;
-  color: #fff !important;
-}
+  .badge.bg-warning {
+    background: #f59e0b !important;
+    color: #fff !important;
+  }
 
-.btn.btn-primary {
-  background: #2563eb;
-  border: none;
-  border-radius: 10px;
-  padding: 6px 12px;
-}
+  .btn.btn-primary {
+    background: #2563eb;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
 
-.btn.btn-primary:hover {
-  filter: brightness(.95);
-}
+  .btn.btn-primary:hover {
+    filter: brightness(.95);
+  }
 
-.btn-vermais {
-  color: #2563eb;
-  font-weight: 500;
-  text-decoration: none;
-}
+  .btn-vermais {
+    color: #2563eb;
+    font-weight: 500;
+    text-decoration: none;
+  }
 
-.btn-vermais:hover {
-  text-decoration: underline;
-  color: #1d4ed8;
-}
+  .btn-vermais:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+  }
 </style>
 
 <footer class="mt-4 text-center text-muted small">
-  <i class="bi bi-lightning-charge text-warning"></i> Sistema de Chamados Institucionais - UniRios 2025
+  <i class="bi bi-lightning-charge text-warning"></i> ⚡ Sistema de Chamados Institucionais — Plataforma Corporativa
 </footer>
 
 {% endblock %}

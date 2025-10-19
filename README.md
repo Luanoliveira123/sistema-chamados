@@ -6,7 +6,7 @@
 
 ---
 
-# 🏫 Sistema de Chamados Institucionais — UniRios 2025
+# 🏫 Sistema de Chamados Institucionais — 2025
 
 Um sistema web desenvolvido em **Flask (Python)** para **gerenciamento de chamados técnicos institucionais**, promovendo agilidade, transparência e eficiência entre setores de manutenção, limpeza, almoxarifado e TI.
 
@@ -89,7 +89,7 @@ python app.py
 
 **Luan de Queiroz Oliveira**  
 Desenvolvido como projeto de conclusão de curso (TCC) —  
-**Centro Universitário UniRios, 2025**  
+**Sistema desenvolvido para uso corporativo e institucional, 2025**  
 Curso: *Sistemas de Informação*  
 
 📧 *luandequeirozoliveira@gmail.com*

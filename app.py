@@ -57,14 +57,16 @@ def inicializar_banco():
 inicializar_banco()
 
 # =========================================
-# LOGIN DOS SETORES
+# LOGIN DOS SETORES (versão final de produção)
 # =========================================
 setores = {
-    "NTI": {"usuario": "nti", "senha": "nti123"},
-    "Elétrica": {"usuario": "eletrica", "senha": "eletrica123"},
+    "NTI": {"usuario": "nti", "senha": "ufalnti2025"},
+    "Elétrica-Coinfra": {"usuario": "coinfra", "senha": "coinfra321"},
+    "Manutenção": {"usuario": "manutencao", "senha": "manutencao1234"},
     "Almoxarifado": {"usuario": "almox", "senha": "almox123"},
+    "Administração": {"usuario": "admin", "senha": "admin2025"},
+    "Servidor": {"usuario": "servidor", "senha": "servidor01"},
     "Limpeza": {"usuario": "limpeza", "senha": "limpeza123"},
-    "Servidores": {"usuario": "servidor", "senha": "servidor123"}
 }
 
 
@@ -352,45 +354,82 @@ def api_by_day():
 
 
 # =========================================
-# BACKUP EXCEL
+# BACKUP EXCEL (setorizado + completo para NTI)
 # =========================================
 @app.route('/backup')
 @login_required
 def backup_excel():
-    if not is_nti():
-        flash("Apenas o NTI pode realizar backups.", "danger")
-        return redirect(url_for("painel"))
+    setor_usuario = session.get("setor")
+    is_nti_user = setor_usuario == "NTI"
 
-    limite_data = datetime.now() - timedelta(days=30)
     conn = conectar()
     c = conn.cursor()
-    c.execute("SELECT * FROM chamados ORDER BY id DESC")
-    todos = c.fetchall()
+
+    # NTI exporta todos os chamados de todos os setores
+    if is_nti_user:
+        c.execute("SELECT * FROM chamados ORDER BY id DESC")
+    else:
+        # Demais setores: exportam apenas seus próprios chamados
+        c.execute(
+            "SELECT * FROM chamados WHERE setor_responsavel = ? ORDER BY id DESC",
+            (setor_usuario,),
+        )
+
+    chamados = c.fetchall()
     conn.close()
 
-    recentes = []
-    for row in todos:
-        try:
-            data = datetime.strptime(row["criado_em"], "%d/%m/%Y %H:%M")
-            if data >= limite_data:
-                recentes.append(row)
-        except:
-            continue
+    if not chamados:
+        flash("Nenhum chamado encontrado para o seu setor.", "warning")
+        return redirect(url_for("painel"))
 
     wb = Workbook()
-    if "Sheet" in wb.sheetnames:
-        del wb["Sheet"]
 
-    agrupados = defaultdict(list)
-    for r in recentes:
-        agrupados[r["setor_responsavel"]].append(r)
+    if is_nti_user:
+        # Agrupa chamados por setor para o NTI
+        agrupados = defaultdict(list)
+        for r in chamados:
+            agrupados[r["setor_responsavel"]].append(r)
 
-    invalid_chars = set(r'[]:*?/\\')
-    for setor, lista in agrupados.items():
-        nome_sheet = ''.join(ch for ch in setor if ch not in invalid_chars)[:30]
-        ws = wb.create_sheet(title=nome_sheet or "Setor")
+        invalid_chars = set(r'[]:*?/\\')
+        for setor, lista in agrupados.items():
+            nome_sheet = ''.join(ch for ch in setor if ch not in invalid_chars)[:30]
+            ws = wb.create_sheet(title=nome_sheet or "Setor")
 
-        headers = ["ID", "Setor Solicitante", "Setor Responsável", "Local", "Descrição", "Prioridade", "Status", "Criado em"]
+            headers = ["ID", "Setor Solicitante", "Setor Responsável", "Local",
+                       "Descrição", "Prioridade", "Status", "Criado em"]
+            ws.append(headers)
+
+            for col in range(1, len(headers) + 1):
+                cell = ws.cell(row=1, column=col)
+                cell.font = Font(bold=True, color="FFFFFF")
+                cell.fill = PatternFill("solid", fgColor="2563EB")
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+
+            for r in lista:
+                ws.append([
+                    r["id"],
+                    r["setor_abertura"] if "setor_abertura" in r.keys() else "",
+                    r["setor_responsavel"],
+                    r["local"],
+                    r["descricao"],
+                    r["prioridade"],
+                    r["status"].capitalize(),
+                    r["criado_em"],
+                ])
+
+            for col in ws.columns:
+                max_len = max((len(str(cell.value)) if cell.value else 0) for cell in col)
+                ws.column_dimensions[col[0].column_letter].width = max_len + 2
+
+        if "Sheet" in wb.sheetnames:
+            del wb["Sheet"]
+
+    else:
+        # Outros setores: planilha única do próprio setor
+        ws = wb.active
+        ws.title = setor_usuario[:30]
+        headers = ["ID", "Setor Solicitante", "Setor Responsável", "Local",
+                   "Descrição", "Prioridade", "Status", "Criado em"]
         ws.append(headers)
 
         for col in range(1, len(headers) + 1):
@@ -399,7 +438,7 @@ def backup_excel():
             cell.fill = PatternFill("solid", fgColor="2563EB")
             cell.alignment = Alignment(horizontal="center", vertical="center")
 
-        for r in lista:
+        for r in chamados:
             ws.append([
                 r["id"],
                 r["setor_abertura"] if "setor_abertura" in r.keys() else "",
@@ -408,25 +447,28 @@ def backup_excel():
                 r["descricao"],
                 r["prioridade"],
                 r["status"].capitalize(),
-                r["criado_em"]
+                r["criado_em"],
             ])
 
         for col in ws.columns:
             max_len = max((len(str(cell.value)) if cell.value else 0) for cell in col)
             ws.column_dimensions[col[0].column_letter].width = max_len + 2
 
-    if not agrupados:
-        ws = wb.create_sheet(title="Sem chamados")
-        ws.append(["Nenhum chamado registrado nos últimos 30 dias."])
-        ws.column_dimensions["A"].width = 60
-
+    # Cria arquivo e envia download
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
 
-    nome_arquivo = f"backup_chamados_30dias_{datetime.now().strftime('%Y-%m-%d_%Hh%M')}.xlsx"
-    return send_file(output, as_attachment=True, download_name=nome_arquivo,
-                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    nome_arquivo = (
+        f"backup_{setor_usuario.lower()}_{datetime.now().strftime('%Y-%m-%d_%Hh%M')}.xlsx"
+    )
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=nome_arquivo,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
 
 # =========================================
