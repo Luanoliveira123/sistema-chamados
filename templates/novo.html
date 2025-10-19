@@ -20,8 +20,11 @@
         <label class="form-label fw-semibold">Setor responsável</label>
         <select name="setor_responsavel" class="form-select form-select-lg" required>
           <option value="" disabled selected>Selecione o setor...</option>
+          {% set setor_atual = session.get('setor', '') %}
           {% for s in setores_responsaveis %}
-          <option value="{{ s }}">{{ s }}</option>
+            {% if s != setor_atual %}
+              <option value="{{ s }}">{{ s }}</option>
+            {% endif %}
           {% endfor %}
         </select>
       </div>
@@ -53,6 +56,5 @@
 <footer>
   ⚡ Sistema de Chamados Institucionais - UniRios 2025
 </footer>
-
 
 {% endblock %}

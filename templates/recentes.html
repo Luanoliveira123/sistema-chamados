@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<div class="container mt-4 mb-5">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <div>
+      <h4 class="fw-bold text-primary mb-1">
+        <i class="bi bi-clock-history me-2"></i> Chamados das Últimas 24h
+      </h4>
+      <p class="text-muted mb-0">Visualização pública — acesso sem login.</p>
+    </div>
+
+    <!-- Botão Início (levemente maior) -->
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('home') }}" 
+         class="btn btn-outline-primary fw-semibold px-3 py-2" 
+         style="font-size: 0.95rem;">
+        <i class="bi bi-house-door-fill me-1"></i> Início
+      </a>
+    </div>
+  </div>
+
+  <!-- Card com tabela -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <!-- Campo de busca -->
+      <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h5 class="fw-bold mb-2 mb-md-0 text-secondary">
+          Últimos chamados registrados
+        </h5>
+        <input id="busca" type="text" placeholder="Filtrar..." 
+               class="form-control form-control-sm" style="max-width:220px;">
+      </div>
+
+      <!-- Tabela -->
+      <div class="table-responsive">
+        <table class="table table-hover align-middle text-center">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Setor Solicitante</th>
+              <th>Setor Responsável</th>
+              <th>Local</th>
+              <th>Descrição</th>
+              <th>Prioridade</th>
+              <th>Status</th>
+              <th>Abertura</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            {% if chamados|length == 0 %}
+            <tr>
+              <td colspan="8" class="text-muted py-4">
+                <i class="bi bi-info-circle me-1"></i> Nenhum chamado registrado nas últimas 24 horas.
+              </td>
+            </tr>
+            {% else %}
+            {% for c in chamados %}
+            <tr>
+              <td><strong>#{{ c.id }}</strong></td>
+              <td>{{ c.setor_abertura or '—' }}</td>
+              <td>{{ c.setor_responsavel }}</td>
+              <td>{{ c.local }}</td>
+              <td class="text-start" style="max-width:420px; white-space:normal;">
+                {% set desc = c.descricao %}
+                {% if desc|length > 100 %}
+                  <span class="descricao-curta">{{ desc[:100] }}...</span>
+                  <span class="descricao-completa d-none">{{ desc }}</span>
+                  <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
+                {% else %}
+                  {{ desc }}
+                {% endif %}
+              </td>
+              <td>
+                {% if c.prioridade == 'vermelho' %}
+                  <span class="badge bg-danger">Urgente</span>
+                {% elif c.prioridade == 'amarelo' %}
+                  <span class="badge bg-warning text-dark">Média</span>
+                {% else %}
+                  <span class="badge bg-success">Normal</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge 
+                  {% if c.status == 'aberto' %} bg-secondary
+                  {% elif c.status == 'em andamento' %} bg-warning text-dark
+                  {% else %} bg-success {% endif %}">
+                  {{ c.status.capitalize() }}
+                </span>
+              </td>
+              <td>{{ c.criado_em }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+document.getElementById('busca').addEventListener('input', e => {
+  const termo = e.target.value.toLowerCase();
+  document.querySelectorAll('#tbody tr').forEach(tr => {
+    tr.style.display = tr.innerText.toLowerCase().includes(termo) ? '' : 'none';
+  });
+});
+
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-vermais")) {
+    const btn = e.target;
+    const curta = btn.previousElementSibling.previousElementSibling;
+    const completa = btn.previousElementSibling;
+    const expanded = !completa.classList.contains("d-none");
+    if (expanded) {
+      completa.classList.add("d-none");
+      curta.classList.remove("d-none");
+      btn.textContent = "Ver mais";
+    } else {
+      completa.classList.remove("d-none");
+      curta.classList.add("d-none");
+      btn.textContent = "Ver menos";
+    }
+  }
+});
+</script>
+
+<footer class="text-center text-muted small mt-5">
+  ⚡ Sistema de Chamados Institucionais — UniRios 2025
+</footer>
+
+{% endblock %}

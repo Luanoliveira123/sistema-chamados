@@ -32,7 +32,10 @@
       <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarNav">
         <ul class="navbar-nav align-items-center">
           <li class="nav-item mx-2">
-            <a class="nav-link px-2" href="{{ url_for('novo_chamado') }}">Abrir Chamado</a>
+            <a class="nav-link px-2"
+              href="{{ url_for('novo_chamado') if session.get('usuario') else url_for('login') }}">
+              Abrir Chamado
+            </a>
           </li>
 
           <li class="nav-item mx-2">
@@ -40,7 +43,6 @@
               Área Técnica
             </a>
           </li>
-
 
           {% if session.get('usuario') == 'nti' %}
           <li class="nav-item mx-2">
@@ -51,16 +53,21 @@
           {% endif %}
 
           {% if session.get('usuario') %}
-          <li class="nav-item ms-2">
+          <li class="nav-item d-flex align-items-center ms-3">
+            <span class="text-light small fw-semibold me-3" style="opacity: 0.9; text-transform: uppercase;">
+              {{ session.get('setor') }}
+            </span>
             <a class="btn btn-light btn-sm fw-semibold text-primary px-3 py-1" href="{{ url_for('logout') }}">
               Sair
             </a>
           </li>
           {% endif %}
+
         </ul>
       </div>
     </div>
   </nav>
+
 
   <div class="container mt-4">
     {% block conteudo %}{% endblock %}

@@ -280,3 +280,70 @@ footer {
 .btn-danger:hover {
   background-color: #bb2d3b;
 }
+/* ===================== RESPONSIVIDADE MOBILE AVANÇADA ===================== */
+@media (max-width: 768px) {
+  /* Centraliza o conteúdo e ajusta margens */
+  .container {
+    padding: 0 12px !important;
+  }
+
+  /* Navbar compacta e legível */
+  .navbar-brand span {
+    font-size: 0.9rem;
+  }
+  .navbar img {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Botões principais maiores e mais clicáveis */
+  .btn-lg, .btn, button {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+
+  /* Textos menores em cards */
+  h4, h5 {
+    font-size: 1.1rem;
+  }
+  p {
+    font-size: 0.9rem;
+  }
+
+  /* Tabelas roláveis horizontalmente */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table th, .table td {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    padding: 6px 8px;
+  }
+
+  /* Ajuste do input de busca */
+  #busca {
+    width: 100%;
+    max-width: none !important;
+    margin-top: 10px;
+  }
+
+  /* Ajustes específicos para login */
+  .login-box {
+    margin: 0 10px;
+    padding: 1.5rem;
+  }
+  .login-logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* Footer mais compacto */
+  footer {
+    font-size: 0.75rem;
+    padding: 8px 0;
+  }
+}

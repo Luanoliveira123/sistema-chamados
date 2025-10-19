@@ -1,223 +1,248 @@
 {% extends "base.html" %}
 {% block conteudo %}
-<div class="container" style="margin-top: 28px; margin-bottom: 80px;"> <!-- 👈 Adicionado margin-bottom para respiro -->
+<div class="container" style="margin-top: 28px; margin-bottom: 80px;">
 
-  <div class="flex-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
-      <h2 style="margin:0 0 6px 0;">📊 Painel Geral — NTI</h2>
-      <p class="text-muted" style="margin:0;">Visão consolidada dos chamados de todos os setores.</p>
+      <h4 class="fw-bold text-primary mb-1"><i class="bi bi-graph-up-arrow me-2"></i>Painel Geral — NTI</h4>
+      <p class="text-muted mb-0">Visão consolidada dos chamados de todos os setores.</p>
     </div>
 
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="{{ url_for('painel') }}" class="btn btn-primary">Ir para Painel</a>
-      <a href="{{ url_for('backup_excel') }}" class="btn btn-secondary">📦 Fazer Backup</a>
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('painel') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-grid-3x3-gap-fill"></i> Ir para Painel
+      </a>
+      <a href="{{ url_for('backup_excel') }}" class="btn btn-secondary btn-sm">
+        <i class="bi bi-download"></i> Fazer Backup
+      </a>
     </div>
   </div>
 
   <!-- KPIs -->
-  <div class="kpis" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-top:18px;">
-    <div class="kpi-card" id="kpi-abertos" style="background:#3b82f6; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
-      <div style="font-size:13px; opacity:.9;">Abertos</div>
-      <div id="kpiAbertosVal" style="font-size:32px; font-weight:700;">0</div>
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white shadow-sm text-center" style="background:#2563eb;">
+        <div class="card-body py-3">
+          <h6 class="fw-normal mb-1">Abertos</h6>
+          <h3 id="kpiAbertosVal" class="fw-bold">0</h3>
+        </div>
+      </div>
     </div>
-    <div class="kpi-card" id="kpi-andamento" style="background:#f59e0b; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
-      <div style="font-size:13px; opacity:.9;">Em andamento</div>
-      <div id="kpiAndamentoVal" style="font-size:32px; font-weight:700;">0</div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white shadow-sm text-center" style="background:#f59e0b;">
+        <div class="card-body py-3">
+          <h6 class="fw-normal mb-1">Em andamento</h6>
+          <h3 id="kpiAndamentoVal" class="fw-bold">0</h3>
+        </div>
+      </div>
     </div>
-    <div class="kpi-card" id="kpi-finalizados" style="background:#10b981; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
-      <div style="font-size:13px; opacity:.9;">Finalizados</div>
-      <div id="kpiFinalizadosVal" style="font-size:32px; font-weight:700;">0</div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white shadow-sm text-center" style="background:#10b981;">
+        <div class="card-body py-3">
+          <h6 class="fw-normal mb-1">Finalizados</h6>
+          <h3 id="kpiFinalizadosVal" class="fw-bold">0</h3>
+        </div>
+      </div>
     </div>
-    <div class="kpi-card" id="kpi-total" style="background:#111827; color:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);">
-      <div style="font-size:13px; opacity:.9;">Total</div>
-      <div id="kpiTotalVal" style="font-size:32px; font-weight:700;">0</div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white shadow-sm text-center" style="background:#111827;">
+        <div class="card-body py-3">
+          <h6 class="fw-normal mb-1">Total</h6>
+          <h3 id="kpiTotalVal" class="fw-bold">0</h3>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Charts -->
-  <div class="charts" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:18px; margin-top:18px;">
-    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05);">
-      <h4 style="margin:0 0 10px 0;">Distribuição por Status</h4>
-      <canvas id="chartStatus"></canvas>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm" style="height: 360px;">
+        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+          <h6 class="fw-bold mb-3 w-100 text-start">Distribuição por Status</h6>
+          <canvas id="chartStatus" style="max-height:280px;"></canvas>
+        </div>
+      </div>
     </div>
-    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05);">
-      <h4 style="margin:0 0 10px 0;">Chamados por Setor</h4>
-      <canvas id="chartSetor"></canvas>
+    <div class="col-md-6">
+      <div class="card shadow-sm" style="height: 360px;">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Chamados por Setor</h6>
+          <canvas id="chartSetor" style="max-height:280px;"></canvas>
+        </div>
+      </div>
     </div>
-    <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05); grid-column:1 / -1;">
-      <h4 style="margin:0 0 10px 0;">Evolução (últimos 30 dias)</h4>
-      <canvas id="chartDia"></canvas>
+    <div class="col-12">
+      <div class="card shadow-sm" style="height: 320px;">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Evolução (últimos 30 dias)</h6>
+          <canvas id="chartDia" style="max-height:250px;"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabela geral -->
-  <div class="card" style="background:#fff; border-radius:14px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.05); margin-top:18px; padding-bottom:20px;">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-      <h4 style="margin:0;">Últimos chamados</h4>
-      <input id="busca" type="text" placeholder="Filtrar..." style="border:1px solid #e5e7eb; border-radius:10px; padding:8px 10px; outline:none;">
-    </div>
-    <div style="overflow:auto; margin-top:10px;">
-      <table class="tabela" style="width:100%; border-collapse:collapse; text-align:center;">
-        <thead>
-          <tr style="background:#f3f4f6; vertical-align:middle;">
-            <th style="padding:10px;">#</th>
-            <th style="padding:10px;">Setor</th>
-            <th style="padding:10px;">Local</th>
-            <th style="padding:10px;">Descrição</th>
-            <th style="padding:10px;">Prioridade</th>
-            <th style="padding:10px;">Status</th>
-            <th style="padding:10px;">Abertura</th>
-            <th style="padding:10px;">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          {% for c in ultimos %}
-          <tr style="vertical-align:middle;">
-            <td style="padding:10px;">#{{ c['id'] }}</td>
-            <td style="padding:10px;">{{ c['setor_responsavel'] }}</td>
-            <td style="padding:10px;">{{ c['local'] }}</td>
-            <td style="padding:10px; max-width:420px; white-space:normal; text-align:left;">
-              {% set desc = c['descricao'] %}
-              {% if desc|length > 100 %}
-                <span class="descricao-curta">{{ desc[:100] }}...</span>
-                <span class="descricao-completa d-none">{{ desc }}</span>
-                <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
-              {% else %}
-                {{ desc }}
-              {% endif %}
-            </td>
-            <td style="padding:10px;">
-              {% if c['prioridade'] == 'vermelho' %}
-                <span class="badge bg-danger">Urgente</span>
-              {% elif c['prioridade'] == 'amarelo' %}
-                <span class="badge bg-warning text-dark">Média</span>
-              {% else %}
-                <span class="badge bg-success">Normal</span>
-              {% endif %}
-            </td>
-            <td style="padding:10px;">
-              <span class="badge" data-status="{{ c['status'] }}">{{ c['status'].capitalize() }}</span>
-            </td>
-            <td style="padding:10px;">{{ c['criado_em'] }}</td>
+  <!-- Tabela -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+        <h5 class="fw-bold mb-2 mb-md-0">Últimos chamados</h5>
+        <input id="busca" type="text" placeholder="Filtrar..." class="form-control form-control-sm" style="max-width:220px;">
+      </div>
 
-            <!-- ✅ Ações corrigidas -->
-            <td style="padding:10px; text-align:center; width:200px;">
-              <div style="display:flex; align-items:center; justify-content:center; gap:16px;">
-                
-                <!-- Formulário para alterar status -->
-                <form method="post" action="{{ url_for('alterar', cid=c['id']) }}" 
-                      style="display:flex; flex-direction:row; align-items:center; gap:12px;">
-                  <select name="status" required class="form-select form-select-sm text-center" style="min-width:120px;">
-                    <option value="aberto" {{ 'selected' if c['status']=='aberto' else '' }}>Aberto</option>
-                    <option value="em andamento" {{ 'selected' if c['status']=='em andamento' else '' }}>Em andamento</option>
-                    <option value="finalizado" {{ 'selected' if c['status']=='finalizado' else '' }}>Finalizado</option>
-                  </select>
-                  <button class="btn btn-primary btn-sm w-100" type="submit">Salvar</button>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle text-center">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Setor Solicitante</th>
+              <th>Setor Responsável</th>
+              <th>Local</th>
+              <th>Descrição</th>
+              <th>Prioridade</th>
+              <th>Status</th>
+              <th>Abertura</th>
+              <th style="width:60px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            {% for c in ultimos %}
+            <tr>
+              <td><strong>#{{ c.id }}</strong></td>
+              <td>{{ c.setor_abertura or '—' }}</td>
+              <td>{{ c.setor_responsavel }}</td>
+              <td>{{ c.local }}</td>
+              <td class="text-start" style="max-width:420px; white-space:normal;">
+                {% set desc = c.descricao %}
+                {% if desc|length > 100 %}
+                  <span class="descricao-curta">{{ desc[:100] }}...</span>
+                  <span class="descricao-completa d-none">{{ desc }}</span>
+                  <a href="#" class="btn-vermais small fw-semibold text-primary text-decoration-none">Ver mais</a>
+                {% else %}
+                  {{ desc }}
+                {% endif %}
+              </td>
+              <td>
+                {% if c.prioridade == 'vermelho' %}
+                  <span class="badge bg-danger">Urgente</span>
+                {% elif c.prioridade == 'amarelo' %}
+                  <span class="badge bg-warning text-dark">Média</span>
+                {% else %}
+                  <span class="badge bg-success">Normal</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge 
+                  {% if c.status == 'aberto' %} bg-secondary 
+                  {% elif c.status == 'em andamento' %} bg-warning text-dark 
+                  {% else %} bg-success {% endif %}">
+                  {{ c.status.capitalize() }}
+                </span>
+              </td>
+              <td>{{ c.criado_em }}</td>
+              <td>
+                <form method="post" action="{{ url_for('excluir', cid=c.id) }}" 
+                      onsubmit="return confirm('Deseja realmente excluir este chamado?');">
+                  <button type="submit" class="btn btn-link p-0" style="color:#dc2626;">
+                    <i class="bi bi-trash3-fill fs-5"></i>
+                  </button>
                 </form>
-
-                <!-- Formulário separado para excluir -->
-                <form method="post" action="{{ url_for('excluir', cid=c['id']) }}" 
-                      onsubmit="return confirm('Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.');"
-                      style="display:flex; align-items:center; justify-content:center;">
-                  <button type="submit" class="btn btn-danger btn-sm w-100">Excluir</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Chart.js CDN -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Ver mais -->
-<script>
-document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("btn-vermais")) {
-    const btn = e.target;
-    const curta = btn.previousElementSibling.previousElementSibling;
-    const completa = btn.previousElementSibling;
-    const expanded = !completa.classList.contains("d-none");
-
-    if (expanded) {
-      completa.classList.add("d-none");
-      curta.classList.remove("d-none");
-      btn.textContent = "Ver mais";
-    } else {
-      completa.classList.remove("d-none");
-      curta.classList.add("d-none");
-      btn.textContent = "Ver menos";
-    }
-  }
-});
-</script>
-
-<!-- Charts -->
 <script>
 async function loadOverview() {
-  const r = await fetch('/api/dashboard/overview'); if (!r.ok) return;
+  const r = await fetch('/api/dashboard/overview');
+  if (!r.ok) return;
   const d = await r.json();
   document.getElementById('kpiAbertosVal').textContent = d.abertos ?? 0;
   document.getElementById('kpiAndamentoVal').textContent = d.andamento ?? 0;
   document.getElementById('kpiFinalizadosVal').textContent = d.finalizados ?? 0;
   document.getElementById('kpiTotalVal').textContent = d.total ?? 0;
 
-  const ctx1 = document.getElementById('chartStatus');
-  new Chart(ctx1, {
+  new Chart(document.getElementById('chartStatus'), {
     type: 'doughnut',
-    data: { labels: ['Abertos', 'Em andamento', 'Finalizados'], datasets: [{ data: [d.abertos, d.andamento, d.finalizados] }] },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    data: {
+      labels: ['Abertos', 'Em andamento', 'Finalizados'],
+      datasets: [{
+        data: [d.abertos, d.andamento, d.finalizados],
+        backgroundColor: ['#2563eb', '#f59e0b', '#10b981'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '60%',
+      plugins: { legend: { position: 'bottom' } }
+    }
   });
 }
+
 async function loadBySector() {
-  const r = await fetch('/api/dashboard/by_sector'); if (!r.ok) return;
+  const r = await fetch('/api/dashboard/by_sector');
+  if (!r.ok) return;
   const d = await r.json();
-  const ctx2 = document.getElementById('chartSetor');
-  new Chart(ctx2, {
+  new Chart(document.getElementById('chartSetor'), {
     type: 'bar',
-    data: { labels: d.labels, datasets: [{ label: 'Chamados', data: d.values }] },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    data: { labels: d.labels, datasets: [{ label: 'Chamados', data: d.values, backgroundColor: '#2563eb' }] },
+    options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
   });
 }
+
 async function loadByDay() {
-  const r = await fetch('/api/dashboard/by_day'); if (!r.ok) return;
+  const r = await fetch('/api/dashboard/by_day');
+  if (!r.ok) return;
   const d = await r.json();
-  const ctx3 = document.getElementById('chartDia');
-  new Chart(ctx3, {
+  new Chart(document.getElementById('chartDia'), {
     type: 'line',
-    data: { labels: d.labels, datasets: [{ label: 'Chamados/dia', data: d.values, tension: .3 }] },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    data: { labels: d.labels, datasets: [{ label: 'Chamados', data: d.values, borderColor: '#2563eb', tension: 0.3 }] },
+    options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
   });
 }
-const busca = document.getElementById('busca');
-if (busca) {
-  busca.addEventListener('input', () => {
-    const termo = busca.value.toLowerCase();
-    document.querySelectorAll('#tbody tr').forEach(tr => {
-      tr.style.display = tr.innerText.toLowerCase().includes(termo) ? '' : 'none';
-    });
+
+document.getElementById('busca').addEventListener('input', e => {
+  const termo = e.target.value.toLowerCase();
+  document.querySelectorAll('#tbody tr').forEach(tr => {
+    tr.style.display = tr.innerText.toLowerCase().includes(termo) ? '' : 'none';
   });
-}
-loadOverview(); loadBySector(); loadByDay();
+});
+
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-vermais")) {
+    e.preventDefault();
+    const curta = e.target.previousElementSibling.previousElementSibling;
+    const completa = e.target.previousElementSibling;
+    const expandido = !completa.classList.contains("d-none");
+    if (expandido) {
+      completa.classList.add("d-none");
+      curta.classList.remove("d-none");
+      e.target.textContent = "Ver mais";
+    } else {
+      completa.classList.remove("d-none");
+      curta.classList.add("d-none");
+      e.target.textContent = "Ver menos";
+    }
+  }
+});
+
+loadOverview();
+loadBySector();
+loadByDay();
 </script>
 
-<style>
-.badge[data-status="aberto"]{ background:#e5e7eb; color:#111827; border-radius:999px; padding:4px 10px; font-size:12px; }
-.badge[data-status="em andamento"]{ background:#f59e0b; color:#fff; border-radius:999px; padding:4px 10px; font-size:12px; }
-.badge[data-status="finalizado"]{ background:#10b981; color:#fff; border-radius:999px; padding:4px 10px; font-size:12px; }
-.form-select{ border:1px solid #e5e7eb; border-radius:10px; padding:6px 8px; outline:none; }
-.btn.btn-primary{ background:#2563eb; border:none; border-radius:10px; padding:6px 12px; color:#fff; cursor:pointer; }
-.btn.btn-primary:hover{ filter:brightness(.95); }
-.btn-vermais{ color:#2563eb; font-weight:500; text-decoration:none; }
-.btn-vermais:hover{ text-decoration:underline; color:#1d4ed8; }
-</style>
-
-<footer class="mt-5 text-center text-muted small">
-  ⚡ Sistema de Chamados Institucionais - UniRios 2025
+<footer class="text-center text-muted small mt-5">
+  ⚡ Sistema de Chamados Institucionais — UniRios 2025
 </footer>
-
 {% endblock %}

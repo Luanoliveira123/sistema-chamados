@@ -24,7 +24,7 @@
       <i class="bi bi-collection"></i> Todos
     </a>
 
-    <!-- NOVO SELETOR DE SETOR -->
+    <!-- Seletor de setor (somente NTI) -->
     {% if session.get('usuario') == 'nti' %}
     <form method="get" action="{{ url_for('painel') }}" class="ms-3 d-flex align-items-center">
       <input type="hidden" name="status" value="{{ filtro }}">
@@ -42,12 +42,13 @@
   </div>
 </div>
 
-<!-- Tabela de Chamados -->
-<div class="table-responsive mb-5" style="padding-bottom: 20px;">
+<!-- Tabela -->
+<div class="table-responsive mb-5">
   <table class="table table-hover align-middle text-center">
-    <thead class="align-middle" style="vertical-align:middle;">
+    <thead class="align-middle">
       <tr style="background:#f3f4f6;">
         <th>#</th>
+        <th>Setor Solicitante</th>
         <th>Setor Responsável</th>
         <th>Local</th>
         <th>Descrição</th>
@@ -60,7 +61,7 @@
     <tbody>
       {% if chamados|length == 0 %}
       <tr>
-        <td colspan="8" class="text-muted py-4">
+        <td colspan="9" class="text-muted py-4">
           <i class="bi bi-inbox me-2"></i> Nenhum chamado encontrado para este filtro.
         </td>
       </tr>
@@ -68,9 +69,21 @@
       {% for c in chamados %}
       <tr style="vertical-align:middle;">
         <td><strong>#{{ c.id }}</strong></td>
+        <td>{{ c.setor_abertura }}</td>
         <td>{{ c.setor_responsavel }}</td>
         <td>{{ c.local }}</td>
-        <td class="text-start" style="max-width:420px; white-space:normal;">{{ c.descricao }}</td>
+
+        <!-- Descrição com ver mais -->
+        <td class="text-start" style="max-width:420px; white-space:normal;">
+          {% set desc = c.descricao %}
+          {% if desc|length > 100 %}
+            <span class="descricao-curta">{{ desc[:100] }}...</span>
+            <span class="descricao-completa d-none">{{ desc }}</span>
+            <button type="button" class="btn-vermais btn btn-link p-0" style="font-size:13px;">Ver mais</button>
+          {% else %}
+            {{ desc }}
+          {% endif %}
+        </td>
 
         <!-- Prioridade -->
         <td>
@@ -98,29 +111,25 @@
 
         <!-- Ações -->
         <td style="text-align:center; width:220px;">
-          <div style="display:flex; align-items:center; justify-content:center; gap:18px;">
-            <!-- Formulário de alteração -->
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
             <form method="post" action="{{ url_for('alterar', cid=c.id) }}"
-              style="display:flex; flex-direction:row; align-items:center; gap:12px;">
-
-              <select name="status" required class="form-select form-select-sm text-center" style="min-width:120px;">
+              style="display:flex; flex-direction:row; align-items:center; gap:10px;">
+              <select name="status" required class="form-select form-select-sm text-center" style="min-width:130px;">
                 <option value="aberto" {% if c.status=='aberto' %}selected{% endif %}>Aberto</option>
                 <option value="em andamento" {% if c.status=='em andamento' %}selected{% endif %}>Em andamento</option>
                 <option value="finalizado" {% if c.status=='finalizado' %}selected{% endif %}>Finalizado</option>
               </select>
-
-              <button class="btn btn-primary btn-sm w-100" type="submit">Salvar</button>
+              <button class="btn btn-primary btn-sm" type="submit">Salvar</button>
             </form>
 
-            <!-- Formulário separado para exclusão -->
             <form method="post" action="{{ url_for('excluir', cid=c.id) }}"
-              onsubmit="return confirm('Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.');"
-              style="display:flex; align-items:center; justify-content:center;">
-              <button type="submit" class="btn btn-danger btn-sm w-100">Excluir</button>
+              onsubmit="return confirm('Tem certeza que deseja excluir este chamado? Esta ação não poderá ser desfeita.');">
+              <button type="submit" class="btn p-0 border-0 bg-transparent">
+                <i class="bi bi-trash text-danger" style="font-size:1.2rem;"></i>
+              </button>
             </form>
           </div>
         </td>
-
       </tr>
       {% endfor %}
       {% endif %}
@@ -128,56 +137,73 @@
   </table>
 </div>
 
-<!-- Rodapé -->
+<!-- Script Ver Mais -->
+<script>
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-vermais")) {
+    const btn = e.target;
+    const curta = btn.previousElementSibling.previousElementSibling;
+    const completa = btn.previousElementSibling;
+    const expanded = !completa.classList.contains("d-none");
+    if (expanded) {
+      completa.classList.add("d-none");
+      curta.classList.remove("d-none");
+      btn.textContent = "Ver mais";
+    } else {
+      completa.classList.remove("d-none");
+      curta.classList.add("d-none");
+      btn.textContent = "Ver menos";
+    }
+  }
+});
+</script>
+
+<!-- Estilos -->
+<style>
+.table th,
+.table td {
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+.badge.bg-danger {
+  background: #dc2626 !important;
+}
+
+.badge.bg-success {
+  background: #16a34a !important;
+}
+
+.badge.bg-warning {
+  background: #f59e0b !important;
+  color: #fff !important;
+}
+
+.btn.btn-primary {
+  background: #2563eb;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+
+.btn.btn-primary:hover {
+  filter: brightness(.95);
+}
+
+.btn-vermais {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.btn-vermais:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+</style>
+
 <footer class="mt-4 text-center text-muted small">
   <i class="bi bi-lightning-charge text-warning"></i> Sistema de Chamados Institucionais - UniRios 2025
 </footer>
-
-<style>
-  .table th,
-  .table td {
-    vertical-align: middle !important;
-    text-align: center;
-  }
-
-  .badge.bg-danger {
-    background: #dc2626 !important;
-  }
-
-  .badge.bg-success {
-    background: #16a34a !important;
-  }
-
-  .badge.bg-warning {
-    background: #f59e0b !important;
-    color: #fff !important;
-  }
-
-  .btn.btn-primary {
-    background: #2563eb;
-    border: none;
-    border-radius: 10px;
-    padding: 6px 12px;
-  }
-
-  .btn.btn-primary:hover {
-    filter: brightness(.95);
-  }
-
-  .btn.btn-danger {
-    background: #dc2626;
-    border: none;
-    border-radius: 10px;
-    padding: 6px 12px;
-  }
-
-  .btn.btn-danger:hover {
-    filter: brightness(.9);
-  }
-
-  select.form-select-sm {
-    font-size: 14px;
-  }
-</style>
 
 {% endblock %}
