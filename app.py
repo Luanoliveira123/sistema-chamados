@@ -7,6 +7,7 @@ from collections import defaultdict
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
+import pytz
 
 # =========================================
 # CONFIGURAÇÃO PRINCIPAL
@@ -120,6 +121,7 @@ def novo_chamado():
     return render_template('novo.html', setores_responsaveis=list(setores.keys()))
 
 
+
 @app.route('/abrir', methods=['POST'])
 @login_required
 def abrir():
@@ -128,7 +130,10 @@ def abrir():
     setor_responsavel = request.form['setor_responsavel'].strip()
     descricao = request.form['descricao'].strip()
     prioridade = request.form['prioridade'].strip()
-    criado_em = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    # 🕒 Corrige o horário para o fuso do Brasil (Brasília)
+    tz = pytz.timezone("America/Sao_Paulo")
+    criado_em = datetime.now(tz).strftime("%d/%m/%Y %H:%M")
 
     conn = conectar()
     c = conn.cursor()
